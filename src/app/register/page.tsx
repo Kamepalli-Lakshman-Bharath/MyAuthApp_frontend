@@ -2,61 +2,78 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import InputField from "@/components/InputField";
 
-interface FormFields {
+interface FormData {
+  "Full Name"?: string;
   Email?: string;
+  "Mobile Number"?: string;
   Password?: string;
+  "Re-Enter Password"?: string;
 }
 
-interface FieldConfig {
-  name: keyof FormFields;
+interface FormField {
+  name: string;
   placeholder: string;
 }
 
-const LoginForm: React.FC = () => {
-  const [form, setForm] = useState<FormFields>({});
+const Register: React.FC = () => {
+  const [form, setForm] = useState<FormData>({});
   const [isInvalid, setIsInvalid] = useState<boolean>(false);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    const { value, name } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     setIsInvalid(false);
   };
 
-  const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const { Email, Password } = form;
-    if (!Email || !Password) {
-      setIsInvalid(true);
-      return;
-    }
-    // TODO: Make API call here
+  const isFormValid = (): boolean => {
+    return true;
   };
 
-  const formFields: FieldConfig[] = [
+  const handleFormSubmit = async (
+    e: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    e.preventDefault();
+
+    // api call
+  };
+
+  const formFields: FormField[] = [
+    {
+      name: "Full Name",
+      placeholder: "Enter Full Name",
+    },
     {
       name: "Email",
       placeholder: "Enter the EmailId",
     },
     {
+      name: "Mobile Number",
+      placeholder: "Enter the Mobile Number",
+    },
+    {
       name: "Password",
       placeholder: "Enter the Password",
+    },
+    {
+      name: "Re-Enter Password",
+      placeholder: "Re-Enter the Password",
     },
   ];
 
   return (
     <form
-      className="w-[310px] md:w-[400px] p-4 md:px-[40px] rounded flex-shrink-0 shadow ring-[#FF8541] ring-[0.1px]"
+      className=" w-[310px] md:w-[400px] p-4 md:px-[40px] rounded flex-shrink-0 shadow ring-[0.1px]"
       onSubmit={handleFormSubmit}
     >
-      <p className="text-center font-semibold mb-2 text-2xl">Login</p>
+      <p className="text-center font-semibold mb-2 text-2xl">Register</p>
       <div className="gap-[2px] flex flex-col">
-        {formFields.map((item, idx) => {
+        {formFields.map((item: FormField, idx: number) => {
           const { name } = item;
           return (
             <InputField
               key={name + idx}
               onChange={handleInputChange}
-              value={form[name] || ""}
+              value={form[name as keyof FormData] || ""}
               {...item}
             />
           );
@@ -79,4 +96,4 @@ const LoginForm: React.FC = () => {
   );
 };
 
-export default LoginForm;
+export default Register;
