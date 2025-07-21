@@ -1,6 +1,9 @@
 "use client";
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import InputField from "@/components/InputField";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import useToast from "@/hooks/useToast";
 
 interface FormFields {
   Email?: string;
@@ -21,15 +24,39 @@ const LoginForm: React.FC = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
     setIsInvalid(false);
   };
+  const { showErrorToast, showSuccessToast } = useToast();
+  const { push } = useRouter();
 
   const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { Email, Password } = form;
+
     if (!Email || !Password) {
       setIsInvalid(true);
       return;
     }
-    // TODO: Make API call here
+
+    try {
+      const response = await axios.post("http://localhost:8000/user/login", {
+        email: Email,
+        password: Password,
+      });
+
+      const { access_token, token_type, id } = response.data;
+      if (access_token && id) {
+        localStorage.setItem("token", token_type + " " + access_token);
+        localStorage.setItem("userId", id);
+        showSuccessToast({ message: "Login successful" });
+        push(`/profile`);
+      } else {
+        showErrorToast({ message: "Token not received" });
+        console.error("Token not received");
+      }
+    } catch (err) {
+      showErrorToast({ message: "Invalid login credentials" });
+      setIsInvalid(true);
+      console.error("Login error:", err);
+    }
   };
 
   const formFields: FieldConfig[] = [
